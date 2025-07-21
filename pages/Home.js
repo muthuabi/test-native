@@ -30,15 +30,12 @@ export default function Home({ navigation }) {
 
     // Initialize location tracking
     const initializeLocation = async () => {
-        // 1. Request location permission
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') return;
 
-        // 2. Get current device location
         const location = await Location.getCurrentPositionAsync({});
         const { latitude, longitude } = location.coords;
 
-        // 3. Set initial region for the map
         setCurrentRegion({
             latitude,
             longitude,
@@ -46,24 +43,22 @@ export default function Home({ navigation }) {
             longitudeDelta: 0.01,
         });
 
-        // 4. Start watching user's location in real-time
-        await Location.watchPositionAsync(
+        // Capture the subscription
+        const subscription = await Location.watchPositionAsync(
             {
                 accuracy: Location.Accuracy.High,
-                timeInterval: 3000, // every 3s
-                distanceInterval: 5, // or every 5 meters
+                timeInterval: 3000,
+                distanceInterval: 5,
             },
             (loc) => {
                 const { latitude, longitude } = loc.coords;
 
-                // Update map center to follow user
                 setCurrentRegion((prev) => ({
                     ...prev,
                     latitude,
                     longitude,
                 }));
 
-                // If user is near the marker and alert hasn't shown yet
                 if (selectedMarker && !alertShown) {
                     const distance = getDistance(
                         latitude,
@@ -74,13 +69,15 @@ export default function Home({ navigation }) {
 
                     if (distance < 100) {
                         Alert.alert("You're near the selected location!");
-                        // await triggerNotification();  // ← Uncomment if you want both alert + notification
                         setAlertShown(true);
                     }
                 }
             }
         );
+
+        return subscription; // Return the subscription
     };
+
 
     // Haversine Formula — Calculates distance (in meters) between two geo-points
     const getDistance = (lat1, lon1, lat2, lon2) => {
@@ -108,11 +105,24 @@ export default function Home({ navigation }) {
         setAlertShown(false); // reset alert trigger for new marker
     };
 
+
     // Run once on component mount
     useEffect(() => {
-        initializeLocation();
-        // setupNotifications(); ← Optional: call when ready
+        let subscription;
+
+        const startTracking = async () => {
+            subscription = await initializeLocation();
+        };
+
+        startTracking();
+
+        return () => {
+            if (subscription) {
+                subscription.remove(); // Stop watching location
+            }
+        };
     }, [selectedMarker]);
+
 
     if (!currentRegion) {
         return (
