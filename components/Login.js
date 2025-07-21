@@ -1,23 +1,33 @@
+import React,{useState} from 'react';
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, TextInput, View,TouchableOpacity } from "react-native";
-
+import { StyleSheet, Text, View,TouchableOpacity, TextInput,Image } from "react-native";
+// import { TextInput } from 'react-native-paper';
+import geoLogo from "../assets/icons/geo-earth.png";
 export default function Login() {
-
+  const [formData,setFormData]=useState({username:"",password:""});
+  const handleChangeText=(field,value)=>{
+    setFormData((prev)=>({...prev,[field]:value}));
+  }
+  const handleSubmit=(e)=>{
+    console.log(formData);
+  }
   return (
     <View style={styles.container}>
       <View style={styles.loginContainer}>
+        <Image source={geoLogo} style={styles.imgLogo} />
       <Text style={styles.formHeader}>Login</Text>
         <View style={styles.formGroup}>
           <Text style={styles.formLabel}>Username</Text>
-          <TextInput placeholder="Username" style={styles.formControl} />
+          <TextInput label="Username" value={formData.username} placeholder="Username" onChangeText={(value)=>handleChangeText("username",value)} style={styles.formControl} />
         </View>
         <View style={styles.formGroup}>
           <Text style={styles.formLabel}>Password</Text>
-          <TextInput placeholder="Password" secureTextEntry={true} style={styles.formControl} />
+          <TextInput label="Password" value={formData.password} placeholder="Password" onChangeText={(value)=>handleChangeText("password",value)}  secureTextEntry={true} style={styles.formControl} />
         </View>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
             <Text>Login</Text>
         </TouchableOpacity>
+        <Text>Don't have an Account?</Text>
       </View>
     </View>
   );
@@ -48,6 +58,7 @@ const styles = StyleSheet.create({
   formLabel: {
     fontSize: 16,
     color: "#333",
+    fontWeight:"bold"
   },
   formControl: {
     width: "100%", 
@@ -56,10 +67,14 @@ const styles = StyleSheet.create({
     
   },
   button:{
-    backgroundColor: "#FF9D95",
-    padding: 10,
+    backgroundColor: "#106eA0",
+    padding: 15,
     borderRadius: 5,
     alignItems: "center",
     width: "80%",
+  },
+  imgLogo:{
+      width:120,
+      height:120
   }
 });
