@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Alert, ActivityIndicator } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+
 // import * as Notifications from 'expo-notifications';
 
 export default function Home({ navigation }) {
     const [currentRegion, setCurrentRegion] = useState(null); // User's current map region
     const [selectedMarker, setSelectedMarker] = useState(null); // User-selected blue marker
     const [alertShown, setAlertShown] = useState(false); // Prevents repeated alerts
+    const mapViewRef=useRef(null); // Reference to the MapView
 
     //Set up push notification permissions (but not called yet)
     //   const setupNotifications = async () => {
@@ -28,22 +30,36 @@ export default function Home({ navigation }) {
     //     });
     //   };
 
+    // Toggle marker visibility on press
+    const toggleMarker = () => {
+        if (selectedMarker) {
+            setSelectedMarker(null); // Remove marker
+            setAlertShown(false); // Reset alert state
+        } else {
+            Alert.alert("No marker selected!");
+        }
+    }
     // Initialize location tracking
     const initializeLocation = async () => {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') return;
-
+    
         const location = await Location.getCurrentPositionAsync({});
         const { latitude, longitude } = location.coords;
-
-        setCurrentRegion({
+    
+        const initialRegion = {
             latitude,
             longitude,
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
-        });
-
-        // Capture the subscription
+        };
+    
+        setCurrentRegion(initialRegion);
+    
+        if (mapViewRef.current) {
+            mapViewRef.current.animateToRegion(initialRegion, 1000);
+        }
+    
         const subscription = await Location.watchPositionAsync(
             {
                 accuracy: Location.Accuracy.High,
@@ -52,13 +68,22 @@ export default function Home({ navigation }) {
             },
             (loc) => {
                 const { latitude, longitude } = loc.coords;
-
+    
                 setCurrentRegion((prev) => ({
                     ...prev,
                     latitude,
                     longitude,
                 }));
-
+    
+                if (mapViewRef.current) {
+                    mapViewRef.current.animateToRegion({
+                        latitude,
+                        longitude,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                    }, 1000);
+                }
+    
                 if (selectedMarker && !alertShown) {
                     const distance = getDistance(
                         latitude,
@@ -66,7 +91,7 @@ export default function Home({ navigation }) {
                         selectedMarker.latitude,
                         selectedMarker.longitude
                     );
-
+    
                     if (distance < 100) {
                         Alert.alert("You're near the selected location!");
                         setAlertShown(true);
@@ -74,10 +99,10 @@ export default function Home({ navigation }) {
                 }
             }
         );
-
-        return subscription; // Return the subscription
+    
+        return subscription;
     };
-
+    
 
     // Haversine Formula — Calculates distance (in meters) between two geo-points
     const getDistance = (lat1, lon1, lat2, lon2) => {
@@ -134,7 +159,8 @@ export default function Home({ navigation }) {
 
     return (
         <View style={styles.container}>
-            <MapView
+            <MapView 
+            ref={mapViewRef}
                 style={styles.map}
                 region={currentRegion}
                 onPress={handleMapPress}
@@ -155,6 +181,7 @@ export default function Home({ navigation }) {
                         coordinate={selectedMarker}
                         title="Target"
                         pinColor="blue"
+                        onPress={toggleMarker}
                     />
                 )}
             </MapView>
