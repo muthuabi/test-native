@@ -5,44 +5,41 @@ import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 
 export default function Home({ navigation }) {
-    const [currentRegion, setCurrentRegion] = useState(null); // User's current map region
-    const [selectedMarker, setSelectedMarker] = useState(null); // User-selected blue marker
-    const [alertShown, setAlertShown] = useState(false); // Prevents repeated alerts
-    const mapViewRef = useRef(null); // Reference to the MapView
+    const [currentRegion, setCurrentRegion] = useState(null);
+    const [selectedMarker, setSelectedMarker] = useState(null);
+    const [alertShown, setAlertShown] = useState(false);
+    const mapViewRef = useRef(null);
 
-    // Set up push notification permissions
-    const setupNotifications = async () => {
-        const { status } = await Notifications.getPermissionsAsync();
-        if (status !== 'granted') {
-            await Notifications.requestPermissionsAsync();
-        }
-    };
-
-    // Send notification
-    const triggerNotification = async () => {
-        await Notifications.scheduleNotificationAsync({
-            content: {
-                title: "You’re near the marker!",
-                body: "You're within 100 meters of the selected location.",
-            },
-            trigger: null, // Send immediately
+    // Configure notification behavior (taken from first code)
+    const configureNotifications = () => {
+        Notifications.setNotificationHandler({
+            handleNotification: async () => ({
+                shouldShowAlert: true,
+                shouldPlaySound: true,
+                shouldSetBadge: false,
+            }),
         });
     };
 
-    // Toggle marker visibility on press
-    const toggleMarker = () => {
-        if (selectedMarker) {
-            setSelectedMarker(null); // Remove marker
-            setAlertShown(false); // Reset alert state
-        } else {
-            Alert.alert("No marker selected!");
-        }
+    // Send push notification (from first code)
+    const sendNotification = async (message) => {
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title: 'Location Alert',
+                body: message,
+            },
+            trigger: null,
+        });
     };
 
-    // Initialize location tracking
     const initializeLocation = async () => {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') return;
+        const { status: locStatus } = await Location.requestForegroundPermissionsAsync();
+        const { status: notifStatus } = await Notifications.requestPermissionsAsync();
+
+        if (locStatus !== 'granted' || notifStatus !== 'granted') {
+            Alert.alert('Permission Denied', 'Location & Notification permissions are required!');
+            return;
+        }
 
         const location = await Location.getCurrentPositionAsync({});
         const { latitude, longitude } = location.coords;
@@ -94,7 +91,7 @@ export default function Home({ navigation }) {
 
                     if (distance < 100) {
                         Alert.alert("You're near the selected location!");
-                        triggerNotification(); // Trigger notification
+                        sendNotification("You're within 100 meters of the selected location.");
                         setAlertShown(true);
                     }
                 }
@@ -104,13 +101,12 @@ export default function Home({ navigation }) {
         return subscription;
     };
 
-    // Haversine Formula — Calculates distance (in meters) between two geo-points
     const getDistance = (lat1, lon1, lat2, lon2) => {
         const toRad = (val) => (val * Math.PI) / 180;
-        const R = 6371000; // Earth radius in meters
+        const R = 6371000;
 
         const dLat = toRad(lat2 - lat1);
-        const dLon = toRad(lon1 - lon2);
+        const dLon = toRad(lon2 - lon1);
 
         const a =
             Math.sin(dLat / 2) ** 2 +
@@ -123,19 +119,26 @@ export default function Home({ navigation }) {
         return R * c;
     };
 
-    // User taps on map to place a blue marker
     const handleMapPress = (e) => {
         const { latitude, longitude } = e.nativeEvent.coordinate;
         setSelectedMarker({ latitude, longitude });
-        setAlertShown(false); // reset alert trigger for new marker
+        setAlertShown(false);
     };
 
-    // Run once on component mount
+    const toggleMarker = () => {
+        if (selectedMarker) {
+            setSelectedMarker(null);
+            setAlertShown(false);
+        } else {
+            Alert.alert("No marker selected!");
+        }
+    };
+
     useEffect(() => {
         let subscription;
 
         const startTracking = async () => {
-            await setupNotifications(); // Set up notifications
+            configureNotifications();
             subscription = await initializeLocation();
         };
 
@@ -143,7 +146,7 @@ export default function Home({ navigation }) {
 
         return () => {
             if (subscription) {
-                subscription.remove(); // Stop watching location
+                subscription.remove();
             }
         };
     }, [selectedMarker]);
@@ -164,7 +167,6 @@ export default function Home({ navigation }) {
                 region={currentRegion}
                 onPress={handleMapPress}
             >
-                {/* Current User Location */}
                 <Marker
                     coordinate={{
                         latitude: currentRegion.latitude,
@@ -174,7 +176,6 @@ export default function Home({ navigation }) {
                     pinColor="red"
                 />
 
-                {/* User-selected Marker */}
                 {selectedMarker && (
                     <Marker
                         coordinate={selectedMarker}
