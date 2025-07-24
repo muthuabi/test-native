@@ -17,9 +17,17 @@ export default function Login({navigation}) {
     setErrorText((prev)=>({...prev,[field]:""})); // Clear error while typing
   }
 
-  const handleBlur=(field)=>{
+  const handleBlur = (field) => {
     if (!formData[field]?.trim()) {
-      setErrorText((prev)=>({...prev,[field]:`${field[0].toUpperCase()+field.slice(1)} is required`}));
+      setErrorText((prev) => ({
+        ...prev,
+        [field]: `${field[0].toUpperCase() + field.slice(1)} is required`,
+      }));
+    } else if (field === "username" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData[field])) {
+      setErrorText((prev) => ({
+        ...prev,
+        [field]: "Invalid email format",
+      }));
     }
   };
 
@@ -78,7 +86,7 @@ export default function Login({navigation}) {
           <Text>Login</Text>
         </TouchableOpacity>
 
-        <Text>Don't have an Account?</Text>
+        <Text>Don't have an Account? Contact Admin</Text>
       </View>
     </View>
   );
