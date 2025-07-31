@@ -1,39 +1,65 @@
+import React from 'react';
+import { View, Image, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Button } from 'react-native-paper';
 
-// pages/LandingScreen.js
-import React, { useState } from 'react';
-import { View, Image, StyleSheet, ActivityIndicator } from 'react-native';
-import { Text, Button } from 'react-native-paper';
-
-export default function LandingScreen({ navigation }) {
-  const [loading, setLoading] = useState(false);
-
-  const handleStart = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigation.navigate('Home');
-    }, 1500);
-  };
+const LandingScreen = () => {
+  const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        <>
-          <Image source={{ uri: 'https://cdn.pixabay.com/photo/2017/01/31/21/23/online-2025934_960_720.png' }} style={styles.image} />
-          <Text variant="headlineLarge" style={styles.title}>Welcome to Course Explorer</Text>
-          <Button mode="contained" onPress={handleStart} style={styles.button}>See Courses</Button>
-        </>
-      )}
+      <Image 
+        source={{ uri: 'https://via.placeholder.com/300' }} 
+        style={styles.image} 
+      />
+      <Text style={styles.title}>Product Feedback App</Text>
+      <Text style={styles.subtitle}>Share your experience with our products</Text>
+      <Button 
+        mode="contained" 
+        onPress={() => navigation.navigate('Home')}
+        style={styles.button}
+        labelStyle={styles.buttonText}
+      >
+        Get Started
+      </Button>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  image: { width: 300, height: 200, resizeMode: 'contain', marginBottom: 20 },
-  title: { textAlign: 'center', marginBottom: 20 },
-  button: { marginTop: 10 },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  image: {
+    width: 200,
+    height: 200,
+    marginBottom: 30,
+    borderRadius: 100,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+  button: {
+    width: '80%',
+    paddingVertical: 8,
+    backgroundColor: '#6200ee',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+  },
 });
 
+export default LandingScreen;
