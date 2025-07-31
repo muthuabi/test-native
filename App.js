@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import LandingScreen from './pages/LandingScreen';
 import HomeScreen from './pages/HomeScreen';
 
