@@ -2,8 +2,9 @@ import React,{useState,useEffect} from 'react';
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View,TouchableOpacity, TextInput,Image, Alert } from "react-native";
 import geoLogo from "../assets/icons/geo-earth.png";
-
+import { useAppContext } from '../contexts/AppContext';
 export default function Login({navigation}) {
+  const {setUsername}=useAppContext();
   const [formData,setFormData]=useState({username:"",password:""});
   const [errorText,setErrorText]=useState({username:"",password:""});
   const [submitDisabled,setSubmitDisabled]=useState(true);
@@ -42,6 +43,7 @@ export default function Login({navigation}) {
       return;
     }
     Alert.alert("GeoLogin","Credentials Validated");
+    setUsername(user.username);
     navigation.navigate("Home");
   };
 

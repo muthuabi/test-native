@@ -4,8 +4,8 @@ import { Modal, Portal, Text, Button, TextInput } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import Slider from '@react-native-community/slider';
 
-const FeedbackModal = ({ visible, onDismiss, onSubmit, product, initialData }) => {
-  const [email, setEmail] = useState(initialData?.email || '');
+const FeedbackModal = ({username,visible, onDismiss, onSubmit, product, initialData }) => {
+  const [email, setEmail] = useState(username || '');
   const [rating, setRating] = useState(initialData?.rating || 3);
   const [feedbackType, setFeedbackType] = useState(initialData?.feedbackType || 'general');
   const [comments, setComments] = useState(initialData?.comments || '');
@@ -35,6 +35,7 @@ const FeedbackModal = ({ visible, onDismiss, onSubmit, product, initialData }) =
           style={styles.input}
           keyboardType="email-address"
           autoCapitalize="none"
+          disabled={Boolean(username)}
         />
         
         <Text style={styles.label}>Rating: {rating}</Text>
@@ -45,9 +46,7 @@ const FeedbackModal = ({ visible, onDismiss, onSubmit, product, initialData }) =
           step={1}
           value={rating}
           onValueChange={setRating}
-          minimumTrackTintColor="#6200ee"
           maximumTrackTintColor="#ccc"
-          thumbTintColor="#6200ee"
         />
         
         <Text style={styles.label}>Feedback Type</Text>

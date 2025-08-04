@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image,Text } from 'react-native';
 import { Card, Title, Paragraph, Button } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -16,38 +16,29 @@ const ProductCard = ({ product, onFeedbackPress, feedback }) => {
           <View style={styles.details}>
             <Title style={styles.title}>{product.title}</Title>
             <Paragraph style={styles.price}>${product.price}</Paragraph>
-            <Paragraph style={styles.category}>{product.category}</Paragraph>
           </View>
         </View>
         
         {feedback && (
           <View style={styles.feedbackContainer}>
+            <View style={{   
+              borderBottomColor: 'gray', 
+              borderBottomWidth:0.5, 
+              width: '100%',
+              marginVertical: 10
+              }}></View>
+            <Text style={[styles.price,{marginBottom:3}]}>{feedback.email}</Text>
             <View style={styles.ratingContainer}>
-              <MaterialIcons 
+              {
+                [1,2,3,4,5].map((val,index)=>{
+                  return <MaterialIcons   
+                  key={index}              
                 name="star" 
                 size={20} 
-                color={feedback.rating >= 1 ? '#FFD700' : '#ccc'} 
-              />
-              <MaterialIcons 
-                name="star" 
-                size={20} 
-                color={feedback.rating >= 2 ? '#FFD700' : '#ccc'} 
-              />
-              <MaterialIcons 
-                name="star" 
-                size={20} 
-                color={feedback.rating >= 3 ? '#FFD700' : '#ccc'} 
-              />
-              <MaterialIcons 
-                name="star" 
-                size={20} 
-                color={feedback.rating >= 4 ? '#FFD700' : '#ccc'} 
-              />
-              <MaterialIcons 
-                name="star" 
-                size={20} 
-                color={feedback.rating >= 5 ? '#FFD700' : '#ccc'} 
-              />
+                color={index<feedback.rating ? '#FFD700' : '#ccc'}  />
+                })
+              }
+              
             </View>
             {feedback.comments && (
               <Paragraph style={styles.comment}>"{feedback.comments}"</Paragraph>
@@ -71,7 +62,6 @@ const ProductCard = ({ product, onFeedbackPress, feedback }) => {
 const styles = StyleSheet.create({
   card: {
     marginBottom: 15,
-    elevation: 3,
   },
   row: {
     flexDirection: 'row',
@@ -92,7 +82,6 @@ const styles = StyleSheet.create({
   },
   price: {
     fontWeight: 'bold',
-    color: '#6200ee',
   },
   category: {
     fontStyle: 'italic',
