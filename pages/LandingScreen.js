@@ -8,15 +8,12 @@ const LandingScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Image 
-        source={{ uri: 'https://via.placeholder.com/300' }} 
-        style={styles.image} 
-      />
+
       <Text style={styles.title}>Product Feedback App</Text>
       <Text style={styles.subtitle}>Share your experience with our products</Text>
       <Button 
         mode="contained" 
-        onPress={() => navigation.navigate('Home')}
+        onPress={() => navigation.navigate('Login')}
         style={styles.button}
         labelStyle={styles.buttonText}
       >
@@ -54,7 +51,7 @@ const styles = StyleSheet.create({
   button: {
     width: '80%',
     paddingVertical: 8,
-    backgroundColor: '#6200ee',
+    backgroundColor: '#0a151dff',
   },
   buttonText: {
     color: 'white',
