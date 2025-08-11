@@ -1,11 +1,22 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer} from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Clock from './components/Clock';
+
+const Stack=createNativeStackNavigator();
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Master Base Code... Checkout a Branch with Exp/App Name and use it</Text>
-      <StatusBar style="auto" />
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName='Home'>
+            <Stack.Screen
+              name="Home"
+              component={<Clock/>}
+            />
+        </Stack.Navigator>
+      </NavigationContainer>
     </View>
   );
 }
