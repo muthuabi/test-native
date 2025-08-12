@@ -5,10 +5,12 @@ import Clock from './components/Clock';
 import Timer from './components/Timer';
 import Ionicons from 'react-native-vector-icons/Ionicons'; 
 import {PaperProvider} from 'react-native-paper';
+import ThemeProvider from './contexts/ThemeContext';
 const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
+    <ThemeProvider>
     <PaperProvider>
     <SafeAreaView style={styles.container}>
       <StatusBar />
@@ -32,6 +34,7 @@ export default function App() {
       </NavigationContainer>
     </SafeAreaView>
     </PaperProvider>
+    </ThemeProvider>
   );
 }
 
