@@ -3,7 +3,7 @@ import { View, Text,StyleSheet } from 'react-native';
 import { Modal } from 'react-native-modal';
 import { Card,Chip,Button,Icon } from "react-native-paper";
 
-export default function BookCard({ data }) {
+export default function BookCard({ data,onDelete }) {
     return (
         <Card>
             <Card.Cover source={{ uri: 'https://via.placeholder.com/150' }} />
@@ -17,7 +17,7 @@ export default function BookCard({ data }) {
             </Card.Content>
             <Card.Actions style={styles.cardActions}>
                 <Button icon="pencil" >Edit</Button>
-                <Button icon="delete" >Delete</Button>
+                <Button icon="delete" onPress={()=>onDelete(data.id)}>Delete</Button>
             </Card.Actions>
         </Card>);
 }

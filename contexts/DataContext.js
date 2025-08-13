@@ -60,9 +60,16 @@ const DataProvider=({children})=>{
     const remove=(id)=>{
         setData(prevData=>prevData.filter(val=>val.id!=id));
     }
-
+    const reloadStaticData=()=>{
+        return new Promise((resolve)=>{
+            setTimeout(()=>{
+                setData(staticData);
+                resolve();
+            },2000);
+        });
+    }
     return(
-        <DataContext.Provider value={{data,setData,add,update,remove}}>
+        <DataContext.Provider value={{data,setData,add,update,remove,reloadStaticData}}>
             {children}
         </DataContext.Provider>
     );
