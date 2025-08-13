@@ -1,39 +1,37 @@
 import { StatusBar, SafeAreaView, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Clock from './components/Clock';
-import Timer from './components/Timer';
-import Ionicons from 'react-native-vector-icons/Ionicons'; 
-import {PaperProvider} from 'react-native-paper';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { PaperProvider } from 'react-native-paper';
 import ThemeProvider from './contexts/ThemeContext';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Books from './pages/Books';
+import DataProvider from './contexts/DataContext';
 const Tab = createBottomTabNavigator();
-
+const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <ThemeProvider>
-    <PaperProvider>
-    <SafeAreaView style={styles.container}>
-      <StatusBar />
-      <NavigationContainer>
-        <Tab.Navigator>
-          <Tab.Screen name="Home" component={Clock}             
-          options={{
-              headerShown:false,
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="time-outline" size={size} color={color} />
-              )
-            }} />
-          <Tab.Screen name="Timer" component={Timer} 
-                      options={{
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="hourglass-outline" size={size} color={color} />
-              )
-            }}
-          />
-        </Tab.Navigator>
-      </NavigationContainer>
-    </SafeAreaView>
-    </PaperProvider>
+      <PaperProvider>
+        <DataProvider>
+        <SafeAreaView style={styles.container}>
+          <StatusBar />
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName='Books'>
+              <Stack.Screen name="Books" component={Books}
+                options={{
+                  // headerShown: false,
+
+                  // tabBarIcon: ({ color, size }) => (
+                  //   <Ionicons name="time-outline" size={size} color={color} />
+                  // )
+
+                }} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaView>
+        </DataProvider>
+      </PaperProvider>
     </ThemeProvider>
   );
 }
