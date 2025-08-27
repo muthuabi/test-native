@@ -6,7 +6,7 @@ export default function Home({ navigation }) {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Welcome to Book Store</Text>
-            <Text style={styles.subtitle}>Find your next favorite read among {data.length} books</Text>
+            <Text style={styles.subtitle}>Find your next favorite read among {data.length}+ books</Text>
 
             <Button 
                 mode="contained" 
