@@ -5,7 +5,7 @@ import { FAB } from 'react-native-paper';
 import { useState } from 'react';
 export default function Books()
 {
-    const {data,remove,reloadStaticData}=useData();
+    const {data,remove,add, update, reloadStaticData}=useData();
     const [refresh,setRefresh]=useState(false);
     const onDelete=(id)=>{
         remove(id);
