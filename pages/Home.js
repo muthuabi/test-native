@@ -1,11 +1,12 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
-
+import { useData } from '../contexts/DataContext';
 export default function Home({ navigation }) {
+    const {data}=useData();
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Welcome to Book Store</Text>
-            <Text style={styles.subtitle}>Find your next favorite read</Text>
+            <Text style={styles.subtitle}>Find your next favorite read among {data.length} books</Text>
 
             <Button 
                 mode="contained" 
