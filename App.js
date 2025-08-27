@@ -6,6 +6,7 @@ import { PaperProvider } from 'react-native-paper';
 import ThemeProvider from './contexts/ThemeContext';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Books from './pages/Books';
+import Home from './pages/Home';
 import DataProvider from './contexts/DataContext';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -17,7 +18,12 @@ export default function App() {
         <SafeAreaView style={styles.container}>
           <StatusBar />
           <NavigationContainer>
-            <Stack.Navigator initialRouteName='Books'>
+            <Stack.Navigator initialRouteName='Home'>
+              <Stack.Screen name="Home" component={Home}
+                options={{
+                  headerShown:false,
+                }}
+              />
               <Stack.Screen name="Books" component={Books}
                 options={{
                   // headerShown: false,

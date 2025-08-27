@@ -5,7 +5,7 @@ import { FAB } from 'react-native-paper';
 import { useState } from 'react';
 import BookModal from '../components/BookModal';
 
-export default function Books() {
+export default function Books({navigation}) {
     const { data, remove, add, update, reloadStaticData } = useData();
     const [refresh, setRefresh] = useState(false);
 
