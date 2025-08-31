@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, View, Alert, ActivityIndicator } from "react-native";
-import MapView, { Marker, Circle } from "react-native-maps";
+import MapView, { Marker, Circle,UrlTile } from "react-native-maps";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 
@@ -173,6 +173,11 @@ export default function Home({ navigation }) {
         region={currentRegion}
         onPress={handleMapPress}
       >
+        <UrlTile
+          urlTemplate="https://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maximumZ={19}
+          flipY={false}
+        />
         <Marker
           coordinate={{
             latitude: currentRegion.latitude,
