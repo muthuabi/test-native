@@ -80,7 +80,6 @@ const Scanner = () => {
       {!scanned ? (
         <Camera
           style={styles.camera}
-          type={CameraType.back}
           onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         >
           <View style={styles.scanFrame}>
