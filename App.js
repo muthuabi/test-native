@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Provider as PaperProvider } from 'react-native-paper';
+import { Provider as PaperProvider,Icon } from 'react-native-paper';
 import Home from './pages/Home';
 import Scanner from './pages/Scanner';
 
