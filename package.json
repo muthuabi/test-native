@@ -24,6 +24,7 @@
     "expo-device": "~7.1.4",
     "expo-location": "~18.1.6",
     "expo-notifications": "~0.31.4",
+    "expo-permissions": "^14.4.0",
     "expo-sqlite": "~15.2.14",
     "expo-status-bar": "~2.2.3",
     "formik": "^2.4.6",
