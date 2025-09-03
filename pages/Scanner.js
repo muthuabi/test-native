@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, Linking, SafeAreaView } from 'react-native';
-import { Camera, CameraType, useCameraPermissions } from 'expo-camera';
+import { Camera, CameraType } from 'expo-camera';
+import * as Permissions from 'expo-permissions';
 import { Button, Text, Card, ActivityIndicator } from 'react-native-paper';
-
 // Scanner Component
 const Scanner = () => {
-  const [permission, requestPermission] = useCameraPermissions();
+  const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [scannedData, setScannedData] = useState('');
   const [dataType, setDataType] = useState('');
 
   useEffect(() => {
-    if (!permission?.granted) {
-      requestCameraPermission();
-    }
-  }, [permission]);
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
 
   const requestCameraPermission = async () => {
-    const { status } = await requestPermission();
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    setHasPermission(status === 'granted');
     if (status !== 'granted') {
       Alert.alert(
         'Permission Required',
@@ -53,19 +55,20 @@ const Scanner = () => {
     }
   };
 
-  if (!permission) {
+  if (hasPermission === null) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" />
+        <Text style={styles.permissionText}>Requesting camera permission...</Text>
       </View>
     );
   }
 
-  if (!permission.granted) {
+  if (hasPermission === false) {
     return (
       <View style={styles.center}>
         <Text style={styles.permissionText}>Camera permission is required to use the scanner</Text>
-        <Button mode="contained" onPress={requestPermission} style={styles.button}>
+        <Button mode="contained" onPress={requestCameraPermission} style={styles.button}>
           Grant Permission
         </Button>
       </View>
@@ -131,7 +134,6 @@ const Scanner = () => {
 };
 
 export default Scanner;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
