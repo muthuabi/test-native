@@ -5,7 +5,7 @@ import * as Permissions from 'expo-permissions';
 import { Button, Text, Card, ActivityIndicator } from 'react-native-paper';
 // Scanner Component
 const Scanner = () => {
-  const [hasPermission, setHasPermission] = useState(null);
+  const [hasPermission, setHasPermission] = useState('');
   const [scanned, setScanned] = useState(false);
   const [scannedData, setScannedData] = useState('');
   const [dataType, setDataType] = useState('');
