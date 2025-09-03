@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert, Linking } from 'react-native';
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { View, StyleSheet, Alert, Linking, SafeAreaView } from 'react-native';
+import { Camera, CameraType, useCameraPermissions } from 'expo-camera';
 import { Button, Text, Card, ActivityIndicator } from 'react-native-paper';
 
+// Scanner Component
 const Scanner = () => {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
@@ -63,7 +64,7 @@ const Scanner = () => {
   if (!permission.granted) {
     return (
       <View style={styles.center}>
-        <Text>Camera permission is required to use the scanner</Text>
+        <Text style={styles.permissionText}>Camera permission is required to use the scanner</Text>
         <Button mode="contained" onPress={requestPermission} style={styles.button}>
           Grant Permission
         </Button>
@@ -74,13 +75,10 @@ const Scanner = () => {
   return (
     <View style={styles.container}>
       {!scanned ? (
-        <CameraView
+        <Camera
           style={styles.camera}
-          facing={CameraType.back}
-          onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-          barcodeScannerSettings={{
-            barcodeTypes: ['qr', 'pdf417', 'ean13', 'ean8', 'upc_a', 'upc_e'],
-          }}
+          type={CameraType.back}
+          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         >
           <View style={styles.scanFrame}>
             <View style={styles.cornerTopLeft} />
@@ -89,7 +87,7 @@ const Scanner = () => {
             <View style={styles.cornerBottomRight} />
           </View>
           <Text style={styles.scanText}>Align QR code within the frame</Text>
-        </CameraView>
+        </Camera>
       ) : (
         <View style={styles.resultContainer}>
           <Card style={styles.resultCard}>
@@ -132,14 +130,42 @@ const Scanner = () => {
   );
 };
 
+export default Scanner;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
+  },
+  icon: {
+    marginBottom: 20,
+  },
+  title: {
+    textAlign: 'center',
+    marginBottom: 10,
+    color: '#6200ee',
+  },
+  subtitle: {
+    textAlign: 'center',
+    color: 'gray',
+    marginBottom: 30,
+  },
+  scanButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 30,
+    backgroundColor: '#6200ee',
   },
   camera: {
     flex: 1,
@@ -207,7 +233,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f5f5f5',
   },
   resultCard: {
     width: '100%',
@@ -239,6 +264,8 @@ const styles = StyleSheet.create({
   linkButton: {
     backgroundColor: '#6200ee',
   },
+  permissionText: {
+    marginBottom: 20,
+    textAlign: 'center',
+  },
 });
-
-export default Scanner;
