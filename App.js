@@ -1,49 +1,42 @@
-import { StatusBar, SafeAreaView, StyleSheet } from 'react-native';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { PaperProvider } from 'react-native-paper';
-import ThemeProvider from './contexts/ThemeContext';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Books from './pages/Books';
+import { Provider as PaperProvider } from 'react-native-paper';
 import Home from './pages/Home';
-import DataProvider from './contexts/DataContext';
+import Scanner from './pages/Scanner';
+
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+
 export default function App() {
   return (
-    <ThemeProvider>
-      <PaperProvider>
-        <DataProvider>
-        <SafeAreaView style={styles.container}>
-          <StatusBar />
-          <NavigationContainer>
-            <Stack.Navigator initialRouteName='Home'>
-              <Stack.Screen name="Home" component={Home}
-                options={{
-                  headerShown:false,
-                }}
-              />
-              <Stack.Screen name="Books" component={Books}
-                options={{
-                  // headerShown: false,
-
-                  // tabBarIcon: ({ color, size }) => (
-                  //   <Ionicons name="time-outline" size={size} color={color} />
-                  // )
-
-                }} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </SafeAreaView>
-        </DataProvider>
-      </PaperProvider>
-    </ThemeProvider>
+    <PaperProvider>
+      <NavigationContainer>
+        <Tab.Navigator
+          screenOptions={{
+            tabBarActiveTintColor: '#6200ee',
+            tabBarInactiveTintColor: 'gray',
+          }}
+        >
+          <Tab.Screen 
+            name="Home" 
+            component={Home} 
+            options={{
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="home" color={color} size={size} />
+              ),
+            }}
+          />
+          <Tab.Screen 
+            name="Scan" 
+            component={Scanner} 
+            options={{
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="camera" color={color} size={size} />
+              ),
+            }}
+          />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </PaperProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
