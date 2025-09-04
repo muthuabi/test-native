@@ -1,39 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert, Linking, SafeAreaView } from 'react-native';
-import { Camera, CameraType } from 'expo-camera';
-import * as Permissions from 'expo-permissions';
+import { View, StyleSheet, Alert, Linking } from 'react-native';
+import { CameraView, useCameraPermissions,CameraType } from 'expo-camera';
 import { Button, Text, Card, ActivityIndicator } from 'react-native-paper';
-// Scanner Component
+
 const Scanner = () => {
-  const [hasPermission, setHasPermission] = useState('');
+  const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [scannedData, setScannedData] = useState('');
   const [dataType, setDataType] = useState('');
+  // const [face,setFace]=useState<CameraType>('back');
+  const [face,setFace]=useState("back");
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
-
-  const requestCameraPermission = async () => {
-    const { status } = await Camera.requestCameraPermissionsAsync();
-    setHasPermission(status === 'granted');
-    if (status !== 'granted') {
-      Alert.alert(
-        'Permission Required',
-        'Camera permission is needed to scan QR codes',
-        [{ text: 'OK' }]
-      );
+    if (!permission) {
+      requestPermission();
     }
-  };
-
+  }, [permission]);
+  const toggleFace = () => {
+    setFace((prevFace) => (prevFace === 'back' ? 'front' : 'back'));
+  }
   const handleBarCodeScanned = ({ data }) => {
     setScanned(true);
     setScannedData(data);
-    
-    // Determine data type
+
     if (/^\d+$/.test(data)) {
       setDataType('Number');
     } else if (data.startsWith('http://') || data.startsWith('https://')) {
@@ -55,7 +44,7 @@ const Scanner = () => {
     }
   };
 
-  if (hasPermission === null) {
+  if (!permission) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" />
@@ -64,11 +53,17 @@ const Scanner = () => {
     );
   }
 
-  if (hasPermission === false) {
+  if (!permission.granted) {
     return (
       <View style={styles.center}>
-        <Text style={styles.permissionText}>Camera permission is required to use the scanner</Text>
-        <Button mode="contained" onPress={requestCameraPermission} style={styles.button}>
+        <Text style={styles.permissionText}>
+          Camera permission is required to use the scanner
+        </Text>
+        <Button
+          mode="contained"
+          onPress={requestPermission}
+          style={styles.button}
+        >
           Grant Permission
         </Button>
       </View>
@@ -78,9 +73,10 @@ const Scanner = () => {
   return (
     <View style={styles.container}>
       {!scanned ? (
-        <Camera
+        <CameraView
           style={styles.camera}
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          facing={face}
+          onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
         >
           <View style={styles.scanFrame}>
             <View style={styles.cornerTopLeft} />
@@ -89,7 +85,13 @@ const Scanner = () => {
             <View style={styles.cornerBottomRight} />
           </View>
           <Text style={styles.scanText}>Align QR code within the frame</Text>
-        </Camera>
+          <Button
+            icon="camera"
+            mode="contained"
+            onPress={toggleFace}
+            style={[styles.button, {backgroundColor:"transparent", position: 'absolute', bottom: 20 }]}
+            />
+        </CameraView>
       ) : (
         <View style={styles.resultContainer}>
           <Card style={styles.resultCard}>
@@ -100,7 +102,11 @@ const Scanner = () => {
               <Text variant="bodyMedium" style={styles.dataType}>
                 Type: {dataType}
               </Text>
-              <Text variant="bodySmall" style={styles.scannedData} numberOfLines={3}>
+              <Text
+                variant="bodySmall"
+                style={styles.scannedData}
+                numberOfLines={3}
+              >
                 {scannedData}
               </Text>
             </Card.Content>
@@ -133,46 +139,11 @@ const Scanner = () => {
 };
 
 export default Scanner;
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  icon: {
-    marginBottom: 20,
-  },
-  title: {
-    textAlign: 'center',
-    marginBottom: 10,
-    color: '#6200ee',
-  },
-  subtitle: {
-    textAlign: 'center',
-    color: 'gray',
-    marginBottom: 30,
-  },
-  scanButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 30,
-    backgroundColor: '#6200ee',
-  },
-  camera: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  camera: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scanFrame: {
     width: 250,
     height: 250,
@@ -229,25 +200,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
   },
-  resultContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  resultCard: {
-    width: '100%',
-    marginBottom: 20,
-    elevation: 4,
-  },
-  resultTitle: {
-    color: '#6200ee',
-    marginBottom: 10,
-  },
-  dataType: {
-    color: 'green',
-    marginBottom: 10,
-  },
+  resultContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  resultCard: { width: '100%', marginBottom: 20, elevation: 4 },
+  resultTitle: { color: '#6200ee', marginBottom: 10 },
+  dataType: { color: 'green', marginBottom: 10 },
   scannedData: {
     backgroundColor: '#f0f0f0',
     padding: 10,
@@ -255,18 +211,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
   },
-  buttonContainer: {
-    width: '100%',
-    gap: 10,
-  },
-  button: {
-    marginVertical: 5,
-  },
-  linkButton: {
-    backgroundColor: '#6200ee',
-  },
-  permissionText: {
-    marginBottom: 20,
-    textAlign: 'center',
-  },
+  buttonContainer: { width: '100%', gap: 10 },
+  button: { marginVertical: 5 },
+  linkButton: { backgroundColor: '#6200ee' },
+  permissionText: { marginBottom: 20, textAlign: 'center' },
 });
