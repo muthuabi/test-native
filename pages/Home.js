@@ -5,25 +5,6 @@ import { Button, Text, Card } from 'react-native-paper';
 const Home = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Card style={styles.card}>
-        <Card.Content>
-          <Text variant="headlineMedium" style={styles.title}>
-            Welcome to QR Code Scanner
-          </Text>
-          <Text variant="bodyMedium" style={styles.subtitle}>
-            Scan QR codes and barcodes with ease
-          </Text>
-        </Card.Content>
-      </Card>
-
-      <Button
-        mode="contained"
-        icon="camera"
-        style={styles.button}
-        onPress={() => navigation.navigate('Scan')}
-      >
-        Scan QR Code
-      </Button>
     </View>
   );
 };
