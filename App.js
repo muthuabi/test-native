@@ -30,7 +30,7 @@ export default function App() {
               />
               <Tab.Screen
                 name="Player"
-                component={Scanner}
+                component={Music}
               // options={{
               //   tabBarIcon: ({ color, size }) => (
               //     <Icon name="camera" color={color} size={size} />
