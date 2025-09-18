@@ -1,42 +1,23 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Button, Text, Card } from 'react-native-paper';
+import React from "react";
+import { FlatList } from "react-native";
+import { useData } from "../contexts/DataContext";
+import MusicListCard from "../components/MusicListCard";
+import { useNavigation } from "@react-navigation/native";
 
-const Home = ({ navigation }) => {
+export default function Home() {
+  const { tracks } = useData();
+  const navigation = useNavigation();
+
   return (
-    <View style={styles.container}>
-    </View>
+    <FlatList
+      data={tracks}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item, index }) => (
+        <MusicListCard
+          item={item}
+          onPress={() => navigation.navigate("Music", { index })}
+        />
+      )}
+    />
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  card: {
-    width: '100%',
-    marginBottom: 30,
-    elevation: 4,
-  },
-  title: {
-    textAlign: 'center',
-    marginBottom: 10,
-    color: '#6200ee',
-  },
-  subtitle: {
-    textAlign: 'center',
-    color: 'gray',
-  },
-  button: {
-    marginTop: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 30,
-    backgroundColor: '#6200ee',
-  },
-});
-
-export default Home;
+}
