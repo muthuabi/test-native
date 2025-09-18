@@ -1,0 +1,38 @@
+[
+    {
+      "id": "1",
+      "src": "https://samplelib.com/lib/preview/mp3/sample-3s.mp3",
+      "title": "Sample Song 1",
+      "artist": "Sample Artist",
+      "thumb": "https://picsum.photos/200/200?1"
+    },
+    {
+      "id": "2",
+      "uri": "https://samplelib.com/lib/preview/mp3/sample-6s.mp3",
+      "title": "Sample Song 2",
+      "artist": "Demo Artist",
+      "artwork": "https://picsum.photos/200/200?2"
+    },
+    {
+      "id": "3",
+      "src": "https://samplelib.com/lib/preview/mp3/sample-9s.mp3",
+      "filename": "Track_003.mp3",
+      "artist": "Unknown Artist",
+      "thumb": "https://picsum.photos/200/200?3"
+    },
+    {
+      "id": "4",
+      "src": "https://samplelib.com/lib/preview/mp3/sample-12s.mp3",
+      "title": "Chill Vibes",
+      "artist": "LoFi Beats",
+      "artwork": "https://picsum.photos/200/200?4"
+    },
+    {
+      "id": "5",
+      "src": "https://samplelib.com/lib/preview/mp3/sample-15s.mp3",
+      "title": "Energy Boost",
+      "artist": "Workout Mix",
+      "thumb": "https://picsum.photos/200/200?5"
+    }
+  ]
+  

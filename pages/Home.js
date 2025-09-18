@@ -1,11 +1,14 @@
+//pages/Home.js
 import React from "react";
 import { FlatList } from "react-native";
 import { useData } from "../contexts/DataContext";
+import { useAudio } from "../contexts/AudioContext";
 import MusicListCard from "../components/MusicListCard";
 import { useNavigation } from "@react-navigation/native";
 
 export default function Home() {
   const { tracks } = useData();
+  const { setCurrentIndex } = useAudio();
   const navigation = useNavigation();
 
   return (
@@ -15,7 +18,10 @@ export default function Home() {
       renderItem={({ item, index }) => (
         <MusicListCard
           item={item}
-          onPress={() => navigation.navigate("Music", { index })}
+          onPress={() => {
+            setCurrentIndex(index);
+            navigation.navigate("Music");
+          }}
         />
       )}
     />

@@ -20,22 +20,12 @@ export default function App() {
               }}
             >
               <Tab.Screen
-                name="Music"
+                name="Home"
                 component={Home}
-              // options={{
-              //   tabBarIcon: ({ color, size }) => (
-              //     <Icon name="home" color={color} size={size} />
-              //   ),
-              // }}
               />
               <Tab.Screen
-                name="Player"
+                name="Music"
                 component={Music}
-              // options={{
-              //   tabBarIcon: ({ color, size }) => (
-              //     <Icon name="camera" color={color} size={size} />
-              //   ),
-              // }}
               />
             </Tab.Navigator>
           </NavigationContainer>
