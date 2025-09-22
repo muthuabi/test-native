@@ -1,7 +1,7 @@
-//pages/Music.js
+// pages/Music.js
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Button, Card, Title, Paragraph, IconButton } from "react-native-paper";
+import { Card, Title, Paragraph, IconButton, useTheme } from "react-native-paper";
 import Slider from "@react-native-community/slider";
 import { useAudio } from "../contexts/AudioContext";
 
@@ -17,25 +17,61 @@ export default function Music() {
     playPrev,
     isPlaying,
     isLoaded,
+    position: playbackPosition,
+    duration: playbackDuration,
     seekTo,
   } = useAudio();
 
-  const [position, setPosition] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const theme = useTheme();
 
+  // Local slider state
+  const [sliderValue, setSliderValue] = useState(0);
+  const [isSliding, setIsSliding] = useState(false);
+
+  // Convert ms → seconds
+  const msToSec = (ms) => (ms ? ms / 1000 : 0);
+  const sliderMax = msToSec(playbackDuration) || 1;
+  const sliderPos = isSliding ? sliderValue : msToSec(playbackPosition);
+
+  // Update slider while not sliding
+  useEffect(() => {
+    if (!isSliding) {
+      setSliderValue(sliderPos);
+    }
+  }, [sliderPos, isSliding]);
+
+  // Keep slider synced with playback
+  useEffect(() => {
+    if (!isLoaded) return;
+    const interval = setInterval(() => {
+      if (!isSliding) {
+        setSliderValue(msToSec(playbackPosition));
+      }
+    }, 200); // update every 200ms
+    return () => clearInterval(interval);
+  }, [playbackPosition, isSliding, isLoaded]);
+
+  // Load current track on mount or index change
   useEffect(() => {
     if (currentIndex !== null) loadTrack(currentIndex);
   }, [currentIndex]);
 
-  // Playback status update event listeners can be added for real-time update (not shown here)
-
-  if (!tracks[currentIndex]) return <Text style={styles.noTrack}>No track loaded</Text>;
+  if (!tracks?.[currentIndex])
+    return <Text style={styles.noTrack}>No track loaded</Text>;
 
   const track = tracks[currentIndex];
 
+  const displayTime = (ms) => {
+    if (!ms) return "0:00";
+    const totalSecs = Math.floor(ms / 1000);
+    const mins = Math.floor(totalSecs / 60);
+    const secs = totalSecs % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
   return (
     <View style={styles.container}>
-      <Card style={styles.card}>
+      <Card style={[styles.card, { backgroundColor: theme.colors.surface }]}>
         {track.artwork ? (
           <Card.Cover source={{ uri: track.artwork }} style={styles.artwork} />
         ) : (
@@ -43,87 +79,126 @@ export default function Music() {
             <Text>No Artwork</Text>
           </View>
         )}
-        <Card.Content style={{ alignItems: "center" }}>
+
+        <Card.Content style={{ alignItems: "center", marginTop: 12 }}>
           <Title>{track.title}</Title>
           <Paragraph>{track.artist}</Paragraph>
         </Card.Content>
-        <Card.Actions style={styles.controls}>
-          <IconButton icon="skip-previous" size={36} onPress={playPrev} />
-          {isPlaying ? (
-            <IconButton icon="pause-circle" size={48} onPress={pause} />
-          ) : (
-            <IconButton icon="play-circle" size={48} onPress={play} />
-          )}
-          <IconButton icon="stop-circle" size={36} onPress={stop} />
-          <IconButton icon="skip-next" size={36} onPress={playNext} />
-        </Card.Actions>
-        <View style={styles.sliderContainer}>
+
+        <View style={styles.sliderWrapper}>
           <Slider
-            style={{ width: "100%" }}
+            style={{ width: "100%", height: 40 }}
             minimumValue={0}
-            maximumValue={duration}
-            value={position}
-            minimumTrackTintColor="#6200ee"
-            maximumTrackTintColor="#000000"
-            onSlidingComplete={(value) => {
-              if (isLoaded) {
-                seekTo(value);
-                setPosition(value);
-              }
+            maximumValue={sliderMax}
+            value={sliderValue}
+            minimumTrackTintColor={theme.colors.primary}
+            maximumTrackTintColor={theme.colors.backdrop}
+            thumbTintColor={theme.colors.primary}
+            onValueChange={(value) => {
+              setSliderValue(value);
+              setIsSliding(true);
             }}
+            onSlidingComplete={(value) => {
+              seekTo(value * 1000); // convert back to ms
+              setIsSliding(false);
+            }}
+            disabled={!isLoaded || sliderMax === 0}
           />
           <View style={styles.timeRow}>
-            <Text>{formatTime(position)}</Text>
-            <Text>{formatTime(duration)}</Text>
+            <Text style={styles.timeText}>{displayTime(sliderValue * 1000)}</Text>
+            <Text style={styles.timeText}>{displayTime(sliderMax * 1000)}</Text>
           </View>
         </View>
+
+        <Card.Actions style={styles.controls}>
+          <IconButton
+            icon="skip-previous"
+            size={40}
+            onPress={playPrev}
+            color={theme.colors.primary}
+          />
+          {isPlaying ? (
+            <IconButton
+              icon="pause-circle"
+              size={60}
+              onPress={pause}
+              color={theme.colors.primary}
+            />
+          ) : (
+            <IconButton
+              icon="play-circle"
+              size={60}
+              onPress={play}
+              color={theme.colors.primary}
+            />
+          )}
+          <IconButton
+            icon="stop-circle"
+            size={40}
+            onPress={stop}
+            color={theme.colors.primary}
+          />
+          <IconButton
+            icon="skip-next"
+            size={40}
+            onPress={playNext}
+            color={theme.colors.primary}
+          />
+        </Card.Actions>
       </Card>
     </View>
   );
 }
 
-function formatTime(seconds) {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
     justifyContent: "center",
+    backgroundColor: "#f5f5f5",
   },
   card: {
-    elevation: 4,
     borderRadius: 12,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
   },
   artwork: {
-    height: 300,
+    height: 320,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
   },
   noArtwork: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#ccc",
+    backgroundColor: "#bbb",
   },
   controls: {
     justifyContent: "space-around",
-    paddingHorizontal: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
   },
-  sliderContainer: {
+  sliderWrapper: {
     marginHorizontal: 16,
-    marginBottom: 16,
+    marginTop: 8,
   },
   timeRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    paddingHorizontal: 4,
+  },
+  timeText: {
+    fontSize: 12,
+    fontFamily: "monospace",
+    color: "#666",
   },
   noTrack: {
     flex: 1,
     textAlign: "center",
     marginTop: 100,
     fontSize: 18,
+    color: "#888",
   },
 });
