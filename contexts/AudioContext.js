@@ -1,112 +1,51 @@
-//contexts/AudioContext.js
-import { createContext, useContext, useRef, useState,useEffect } from "react";
-import { createAudioPlayer } from "expo-audio";
+// contexts/AudioContext.js
+import React, { createContext, useContext, useState } from "react";
+import { useAudioPlayer } from "expo-audio";
 import { useData } from "./DataContext";
 
 const AudioContext = createContext();
 
 export default function AudioProvider({ children }) {
   const { tracks } = useData();
-  const playerRef = useRef(createAudioPlayer());
-  const [currentIndex, setCurrentIndex] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const loadTrack = async (index) => {
-    if (!tracks[index]) return;
-    console.log("Loading track",index,tracks[index].uri)
-    if (isLoaded) {
-      await playerRef.current.unloadAsync();
-      setIsLoaded(false);
-      setIsPlaying(false);
-    }
-    console.log("Unloaded previous track if any");
-    // Wrap URI as object for loadAsync
-    await playerRef.current.loadAsync({ uri: tracks[index].uri });
-    console.log("Track loaded");
-    setCurrentIndex(index);
-    setIsLoaded(true);
-  };
+  const currentTrack = tracks?.[currentIndex] || null;
 
-  const play = async () => {
-    console.log("Try to play",isLoaded)
-    if (isLoaded) {
-      await playerRef.current.playAsync();
-      console.log("Playing");
-      setIsPlaying(true);
-    }
-  };
+  // useAudioPlayer hook manages playback and state, reloads on URI change
+  const player = useAudioPlayer(currentTrack ? { uri: currentTrack.uri } : null, {
+    key: currentTrack?.uri,
+  });
 
-  const pause = async () => {
-    if (isLoaded) {
-      await playerRef.current.pauseAsync();
-      setIsPlaying(false);
-    }
+  const play = () => player.play();
+  const pause = () => player.pause();
+  const stop = () => {
+    player.seekTo(0);
+    player.pause();
   };
-
-  const stop = async () => {
-    if (isLoaded) {
-      await playerRef.current.stopAsync();
-      setIsPlaying(false);
-    }
-  };
-
-  const seekTo = async (seconds) => {
-    if (isLoaded) {
-      await playerRef.current.seekTo(seconds);
-    }
-  };
-
-  const unload = async () => {
-    if (isLoaded) {
-      await playerRef.current.unloadAsync();
-      setCurrentIndex(null);
-      setIsLoaded(false);
-      setIsPlaying(false);
-    }
-  };
+  const seekTo = (seconds) => player.seekTo(seconds);
+  const unload = () => player.unload();
 
   const playNext = () => {
-    if (tracks.length) {
-      const nextIndex = (currentIndex + 1) % tracks.length;
-      loadTrack(nextIndex);
-    }
+    if (tracks?.length)
+      setCurrentIndex((currentIndex + 1) % tracks.length);
   };
-  
   const playPrev = () => {
-    if (tracks.length) {
-      const prevIndex = (currentIndex - 1 + tracks.length) % tracks.length;
-      loadTrack(prevIndex);
-    }
-  };  
+    if (tracks?.length)
+      setCurrentIndex((currentIndex - 1 + tracks.length) % tracks.length);
+  };
 
-  // const playNext = () => {
-  //   if (tracks.length && currentIndex !== null && currentIndex < tracks.length - 1) {
-  //     loadTrack(currentIndex + 1);
-  //   }
-  // };
+  // Defensive access to player.state properties
+  const isPlaying = player.state?.isPlaying ?? false;
+  const position = player.state?.positionMillis ?? 0;
+  const duration = player.state?.durationMillis ?? 0;
 
-  // const playPrev = () => {
-  //   if (tracks.length && currentIndex !== null && currentIndex > 0) {
-  //     loadTrack(currentIndex - 1);
-  //   }
-  // };
-  useEffect(() => {
-    loadTrack(0);
-    return () => {
-      // Cleanup on unmount
-      if (isLoaded) {
-        playerRef.current.unloadAsync();
-      }
-    };
-  }, []);
   return (
     <AudioContext.Provider
       value={{
         tracks,
         currentIndex,
         setCurrentIndex,
-        loadTrack,
+        loadTrack: setCurrentIndex,
         play,
         pause,
         stop,
@@ -114,8 +53,10 @@ export default function AudioProvider({ children }) {
         seekTo,
         playNext,
         playPrev,
-        isLoaded,
+        isLoaded: !!currentTrack,
         isPlaying,
+        position,
+        duration,
       }}
     >
       {children}
