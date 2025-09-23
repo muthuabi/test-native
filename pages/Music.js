@@ -85,7 +85,7 @@ export default function Music() {
           <Paragraph>{track.artist}</Paragraph>
         </Card.Content>
 
-        <View style={styles.sliderWrapper}>
+        {/* <View style={styles.sliderWrapper}>
           <Slider
             style={{ width: "100%", height: 40 }}
             minimumValue={0}
@@ -108,7 +108,7 @@ export default function Music() {
             <Text style={styles.timeText}>{displayTime(sliderValue * 1000)}</Text>
             <Text style={styles.timeText}>{displayTime(sliderMax * 1000)}</Text>
           </View>
-        </View>
+        </View> */}
 
         <Card.Actions style={styles.controls}>
           <IconButton
