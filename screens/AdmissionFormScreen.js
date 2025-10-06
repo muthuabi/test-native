@@ -8,7 +8,7 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import { TextInput, Button, Title, Paragraph, Card, Portal, Modal, Text } from 'react-native-paper';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../contexts/AppContext';
 
 // Validation schema
 const AdmissionSchema = Yup.object().shape({

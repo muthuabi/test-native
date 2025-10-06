@@ -6,7 +6,7 @@ import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Card, Title, Paragraph, Text } from 'react-native-paper';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../contexts/AppContext';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),

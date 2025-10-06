@@ -4,7 +4,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Card, Title, Paragraph } from 'react-native-paper';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../contexts/AppContext';
 
 export default function ProfileScreen() {
   const { user } = useApp();

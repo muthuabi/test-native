@@ -3,7 +3,7 @@ import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { AppProvider, useApp } from './context/AppContext';
+import { AppProvider, useApp } from './contexts/AppContext';
 
 // Screens
 import AdmissionFormScreen from './screens/AdmissionFormScreen';

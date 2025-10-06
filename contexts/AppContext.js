@@ -6,6 +6,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import * as MailComposer from 'expo-mail-composer';
+import { send, EmailJSResponseStatus } from '@emailjs/react-native';
+
 
 import SQLiteDataSource from '../data/SQLiteDataSource';
 import JSONDataSource from '../data/JSONDataSource';
@@ -53,11 +55,14 @@ export const AppProvider = ({ children }) => {
   };
 
   // registerStudent: uses dataSource.insertStudent and then sets `user`
+
   const registerStudent = async (payload) => {
     if (!dataSource) throw new Error('Data source not ready');
 
-    // Create application number and ensure minimal fields
+    // 1️⃣ Generate unique application number
     const application_no = generateApplicationNo();
+
+    // 2️⃣ Prepare student object for insertion
     const toInsert = {
       name: payload.name,
       email: payload.email,
@@ -72,39 +77,42 @@ export const AppProvider = ({ children }) => {
     };
 
     try {
+      // 3️⃣ Insert student into data source (SQLite or JSON fallback)
       const created = await dataSource.insertStudent(toInsert);
+
+      // 4️⃣ Set user context (logged in)
       setUser(created);
 
-      // Try to compose an email (this opens the mail composer; no background send).
+      // 5️⃣ Attempt to send email using EmailJS
       try {
-        const isAvailable = await MailComposer.isAvailableAsync();
-        if (isAvailable) {
-          await MailComposer.composeAsync({
-            subject: 'TCE Admission - Account Created',
-            recipients: [created.email],
-            body:
-              `Hello ${created.name},\n\n` +
-              `Your account for TCE admission has been created.\n\n` +
-              `Application No: ${created.application_no}\n` +
-              `Email (username): ${created.email}\n` +
-              `Password: ${created.password}\n\n` +
-              `Please keep these safe.\n\n` +
-              `- TCE Admission App`,
-          });
-        } else {
-          // Mail composer not available; just ignore (optional)
-          console.log('[AppContext] Mail composer not available on device');
-        }
+        await send(
+          'service_expo_XXX01',        // Your EmailJS Service ID
+          'template_expo_XXX01',       // Your EmailJS Template ID
+          {
+            to_name: created.name,           // Matches template variable {{to_name}}
+            to_email: created.email,         // Matches template variable {{to_email}}
+            application_no: created.application_no, // Matches template variable {{application_no}}
+            email: created.email,            // Matches template variable {{email}}
+            password: created.password,      // Matches template variable {{password}}
+          },
+          {
+            publicKey: 'XXXX',               // Your EmailJS Public Key
+          }
+        );
+        console.log('[AppContext] Mail sent successfully via EmailJS');
       } catch (mailErr) {
-        console.warn('[AppContext] Error attempting to send/open mail composer', mailErr);
+        // 6️⃣ If EmailJS fails, log warning but continue
+        console.warn('[AppContext] EmailJS sending failed:', mailErr);
       }
 
+      // 7️⃣ Return the newly created student
       return created;
     } catch (err) {
       console.error('[AppContext] registerStudent error', err);
       throw err;
     }
   };
+
 
   // login: return the user object if success else null
   const login = async (email, password) => {
