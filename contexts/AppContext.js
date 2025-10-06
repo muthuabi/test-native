@@ -4,7 +4,7 @@
 // It exports a hook `useApp()` for easy access in screens.
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert,Platform } from 'react-native';
 import * as MailComposer from 'expo-mail-composer';
 import { send, EmailJSResponseStatus } from '@emailjs/react-native';
 
@@ -43,7 +43,13 @@ export const AppProvider = ({ children }) => {
         setReady(true);
       }
     };
-    init();
+    if(Platform.OS=='web')
+    {
+      const jsonDS = new JSONDataSource();
+      setDataSource(jsonDS);
+    }
+    else
+      init();
   }, []);
 
   // Utility: generate application number: TCE + YEAR + zero-padded id
@@ -86,8 +92,8 @@ export const AppProvider = ({ children }) => {
       // 5️⃣ Attempt to send email using EmailJS
       try {
         await send(
-          'service_expo_XXX01',        // Your EmailJS Service ID
-          'template_expo_XXX01',       // Your EmailJS Template ID
+          'service_expo_01',        // Your EmailJS Service ID
+          'template_expo_01',       // Your EmailJS Template ID
           {
             to_name: created.name,           // Matches template variable {{to_name}}
             to_email: created.email,         // Matches template variable {{to_email}}
@@ -96,7 +102,7 @@ export const AppProvider = ({ children }) => {
             password: created.password,      // Matches template variable {{password}}
           },
           {
-            publicKey: 'XXXX',               // Your EmailJS Public Key
+            publicKey: 'OWWYKWCdp7qO7FszC',               // Your EmailJS Public Key
           }
         );
         console.log('[AppContext] Mail sent successfully via EmailJS');
