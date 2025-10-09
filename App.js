@@ -5,11 +5,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AppProvider from './contexts/AppContext';
 import Home from './screens/HomeScreen';
 import Tasks from './screens/TaskScreen';
+import { PaperProvider,MD2LightTheme as lightTheme,MD2DarkTheme as darkTheme } from 'react-native-paper';
 export default function App() {
   const Stack = createNativeStackNavigator();
   return (
+     <PaperProvider theme={lightTheme}>
     <View style={styles.container}>
       <StatusBar style="auto" />
+     
       <AppProvider>
         <NavigationContainer>
           <Stack.Navigator initialRouteName='Tasks'>
@@ -19,7 +22,9 @@ export default function App() {
 
         </NavigationContainer>
       </AppProvider>
+  
     </View>
+       </PaperProvider>
   );
 }
 
