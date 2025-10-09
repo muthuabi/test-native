@@ -61,7 +61,7 @@ const AppProvider = ({ children }) => {
     const [styles, setStyles] = useState(staticStyles);
     const [source, setSource] = useState(staticTasks);
     const [data, setData] = useState(source);
-    const [taskID,setTaskID]=useState(0);
+    const [taskID,setTaskID]=useState(3);
     useEffect(() => {
         setData(source);
     }, [source]);
@@ -89,15 +89,24 @@ const AppProvider = ({ children }) => {
     const deleteTask=(taskID)=>{
         setSource((src)=>src.filter((task)=>task.id!==taskID));
     }
+    const updateStatus=()=>{
+        const now=new Date();
+        setSource((src)=>src.map(task=>{
+            if(now>task.endOn && task.status!=='completed')
+                return {...task,status:"overdue"}
+            return task;
+        }))
+    }
     const updateTask=(taskID,taskData)=>
     {
         setSource((src)=>src.map(task=>{
             if(task.id===taskID)
                 return {...task,...taskData};
+            return task;
         }))
     }
     return (
-        <AppContext.Provider value={{data,source, styles, reloadSource, setStyles,addTask,updateTask,deleteTask}}>
+        <AppContext.Provider value={{data,source, styles,updateStatus, reloadSource, setStyles,addTask,updateTask,deleteTask}}>
             {children}
         </AppContext.Provider>
     );
