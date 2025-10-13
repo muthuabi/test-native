@@ -17,7 +17,7 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <NavigationContainer>
-          <Stack.Navigator initialRouteName='Document Picker'>
+          <Stack.Navigator initialRouteName='Attendance'>
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Attendance" component={SinglePageAttendance} />
             <Stack.Screen name="Document Picker" component={DocumentPickerScreen} />
