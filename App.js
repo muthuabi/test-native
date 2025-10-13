@@ -11,7 +11,8 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <NavigationContainer>
-          <Stack.Navigator>
+          <Stack.Navigator initialRouteName='Attendance'>
+            <Stack.Screen name="Home" component={()=>(<View><Text>Home</Text></View>)} />
             <Stack.Screen name="Attendance" component={SinglePageAttendance} />
           </Stack.Navigator>
       </NavigationContainer>
@@ -23,7 +24,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding:5
   },
 });
