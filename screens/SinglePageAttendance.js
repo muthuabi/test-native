@@ -49,14 +49,27 @@ const staticData = [
         status: "present",
         markedOn: new Date(),
         createdOn: new Date()
+    },
+        {
+        id: 6,
+        name: "Vikram L",
+        regno: "24Y012",
+        department:"MCA - Department of Comptuter Applications",
+        status: "present",
+        markedOn: new Date(),
+        createdOn: new Date()
     }
 ];
 
+const setStaticStorage=async()=>
+{
+    await AsyncStorage.setItem(KEY,JSON.stringify(staticData))
+}
 const getStorage=async()=>{
     var strData=await AsyncStorage.getItem(KEY);
     if(!strData || strData=='[]')
     {
-        await AsyncStorage.setItem(KEY,JSON.stringify(staticData))
+        setStaticStorage();
         strData=await AsyncStorage.getItem(KEY);
     }
     return JSON.parse(strData);
@@ -73,10 +86,11 @@ const ListItemCard=({student,onMarkAttendance})=>{
     
     return(
         <View style={{marginVertical:5}}>
-        <Card>
+        <Card style={[student.status=='absent' && {backgroundColor:'#FFCCCC'}]}>
             <Card.Title title={student.name} subtitle={student.regno}/>
             <Card.Content>
                 <Text>{student.department}</Text>
+                <Text style={styles.boldText}>{student.status}</Text>
             </Card.Content>
             <Card.Actions>
                     <Switch value={student.status=='present'} onValueChange={onMarkAttendance}></Switch>
@@ -119,6 +133,10 @@ export default function SinglePageAttendance({navigation})
         })
         setStats({total:data.length,present:present,absent:absent});
     }
+    const purgeStorage=()=>{
+        setData([]);
+        deleteStorage();
+    }
     useEffect(()=>{
         updateStats();
     },[data])
@@ -138,7 +156,7 @@ export default function SinglePageAttendance({navigation})
             "Are you sure to Save?",
             [
                 { text: "Cancel", style: "cancel" },
-                { text: "Yes", onPress: () => { setStorage(data).then(() => Alert.alert("Attendance Saved")); } }
+                { text: "Yes", onPress: () => { setStorage(data).then(() => Alert.alert("Attendance","Attendance Saved")); } }
             ],
             { cancelable: false }
         );
@@ -153,23 +171,29 @@ export default function SinglePageAttendance({navigation})
                 <Text style={styles.boldText}>Present - {stats.present}</Text>
                 <Text style={styles.boldText}>Absentees - {stats.absent}</Text>
             </View>
+            <View style={{flexDirection:'row',gap:3}}>
             <Button mode="contained" onPress={saveAttendance} >Save</Button>
+             <Button mode="contained" onPress={purgeStorage} >Purge</Button>
+             </View>
         </View>
-        <ScrollView>
+        {/* <ScrollView> */}
+        {/* Don't know why Flatlist is not scrolling */}
         <FlatList 
             data={data}
             keyExtractor={(item)=>item.id.toString()}
             renderItem={({item})=>(<ListItemCard student={item} onMarkAttendance={(val)=>onMarkAttendance(val,item.id)} />)}
-            ListEmptyComponent={()=>(<View style={{flexDirection:'row',justifyContent:'center'}}><Text style={styles.boldText}>Oops! No Data Found</Text></View>)}
+            ListEmptyComponent={()=>(<View style={{marginTop:25,gap:10,flexDirection:'column',justifyContent:'center',alignItems:'center'}}><Text style={styles.boldText}>Oops! No Data Found</Text><Button mode="outlined" onPress={fetchAsync}>Load Data</Button></View>)}
         />
-        </ScrollView>
+        {/* </ScrollView> */}
     </View>
     );
 }
 
 const styles=StyleSheet.create({
     container:{
+        flex:1,
         padding:5,
+        height:'90%'
     },
     boldText:
     {
